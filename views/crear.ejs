@@ -1,0 +1,41 @@
+<%- include('partials/header'); -%>
+
+
+    <div style="background-color: rgb(31, 31, 31); padding: 50px 0px 50px 0px; color: white; text-align: center;">
+        <h1>Crear</h1>
+        <p>crear</p>
+    </div>
+
+    <!-- Formulario -->
+    <div class="container my-5" >
+        <p>Ingresa aquí tu siguente entrada</p>
+
+        <p class="mb-5" ><%=fecha%>.</p>
+
+
+        <form action="/crear" method="post" >
+            <!-- TITULO -->
+            <div class="form-floating mb-3">
+                <textarea class="form-control" placeholder="Título" id="floatingTextarea" name="titulo" ></textarea>
+                <label for="floatingTextarea">Titulo</label>             
+            </div>
+
+            <!-- CONTENIDO -->
+            <div class="form-floating mb-3">
+                <textarea class="form-control" placeholder="Contenido" id="floatingTextarea" name="contenido" style="height: 100px" ></textarea>
+                <label for="floatingTextarea">Contenido</label>
+            </div>
+
+            <!-- INPUTS OCULTOS -->
+            <input type="text" readonly value="<%=fecha%>" name="fechaEntrada" style="display: none;" >
+
+
+            <!-- botón submit -->
+            <button type="submit" class="btn btn-primary" style="width: 100% !important;" >Subir entrada</button>
+        </form>
+
+    </div>
+
+
+    
+<%- include('partials/footer'); -%>

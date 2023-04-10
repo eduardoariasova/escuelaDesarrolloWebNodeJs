@@ -1,0 +1,25 @@
+<%- include('partials/header'); -%>
+
+
+    <div class="container" >
+        <h1>Mi blog</h1>
+        <p class="mb-5" >Aquí encontrarás todas mis entradas</p>
+
+
+        <!-- Titulo -->
+
+        <%for(let i =0; i < todasEntradas.length; i++){  %>
+            <%let posActual = todasEntradas[i];  %>
+            <!-- POSICION BOCETO -->
+            <h5><%=posActual.fecha%>.</h5>
+            <h2><%=posActual.titulo%>.</h2>
+            <p style="margin-bottom: 50px !important;" > <%=posActual.contenido%>.</p>
+            <!-- POSICION BOCETO -->
+        <%}%>
+    </div>
+    
+
+
+
+    
+<%- include('partials/footer'); -%>
