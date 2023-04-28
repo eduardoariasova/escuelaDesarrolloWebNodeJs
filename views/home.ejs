@@ -11,9 +11,11 @@
         <%for(let i =0; i < todasEntradas.length; i++){  %>
             <%let posActual = todasEntradas[i];  %>
             <!-- POSICION BOCETO -->
-            <h5><%=posActual.fecha%>.</h5>
+            <h5 style="margin-top: 50px !important;"  ><%=posActual.fecha%>.</h5>
             <h2><%=posActual.titulo%>.</h2>
-            <p style="margin-bottom: 50px !important;" > <%=posActual.contenido%>.</p>
+            <p ><%=posActual.contenido.substring(0,150)%>...</p>
+            <a target="_blank" href="entradas/<%=posActual.url%>">Leer más</a>
+            
             <!-- POSICION BOCETO -->
         <%}%>
     </div>
@@ -21,5 +23,4 @@
 
 
 
-    
 <%- include('partials/footer'); -%>

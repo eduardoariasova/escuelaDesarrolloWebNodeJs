@@ -16,7 +16,6 @@ let dia = date.getDate();
 let mes = date.getMonth() + 1;
 let año = date.getFullYear();
 let fechaCompleta = dia + "/" + mes + "/" + año;
-console.log(fechaCompleta);
 // Configuración de fecha /////////
 
 
@@ -51,7 +50,24 @@ var entradas = [
 // home
 app.route("/")
 .get(function(req, res){
-    res.render("home", {todasEntradas: entradas});
+
+    let nuevasEntradas = [];
+    entradas.forEach(element => {
+        // reemplazar espacios por guines, y converir en minúsculas
+        // añadimos / /g para reemplazar TODOS los espacios, no solo el primero que encuentre
+        let urlEntrada = (element.titulo.replace(/ /g, "-")).toLowerCase();
+       
+        // creamos el nuevo documento
+        let nuevoDoc = {
+            fecha: element.fecha,
+            titulo: element.titulo,
+            contenido: element.contenido,
+            url: urlEntrada
+        }
+        // ponemos el documento en el nuevo arreglo
+        nuevasEntradas.push(nuevoDoc);
+    });    
+    res.render("home", {todasEntradas: nuevasEntradas});
 });
 
 // crear
@@ -80,6 +96,26 @@ app.route("/crear")
     res.redirect("/gracias");
 });
 
+
+//BUSCAR POST
+app.route("/entradas/:cualPost")
+.get(function(req, res){
+    // guardar dato recibido en una variable
+    let datoRecibido = req.params.cualPost;
+
+    // buscamos en el arreglo
+    entradas.forEach(element => {
+        // reemplazar espacios por guines, y converir en minúsculas
+        // añadimos / /g para reemplazar TODOS los espacios, no solo el primero que encuentre
+        let urlEntrada = (element.titulo.replace(/ /g, "-")).toLowerCase();
+
+        // comparar
+        if(urlEntrada===datoRecibido){
+            // renderizar
+            res.render("entradaIndividual", {entrada: element});
+        }
+    }); 
+});
 
 
 
