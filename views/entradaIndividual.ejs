@@ -3,16 +3,54 @@
 
 
 
-<div style="background-color: rgb(31, 31, 31); padding: 50px 0px 50px 0px; color: white; text-align: center;">
-    <h1><%=entrada.titulo%></h1>
-    <h5><%=entrada.fecha%></h5>
-</div>
+    <div style="background-color: rgb(31, 31, 31); padding: 50px 0px 50px 0px; color: white; text-align: center;">
+        <h1><%=entrada.titulo%></h1>
+        <h5><%=entrada.fecha%></h5>
+    </div>
 
 
-<div class="container my-5">
-    <p><%=entrada.contenido%></p>
-</div>
+    <div class="container my-5">
+        <p><%=entrada.contenido%></p>
+    </div>
 
+
+
+    <!-- Formulario ACTUALIZAR -->
+    <div class="container mt-5 mb-3" >
+        <h5>¿Quieres actualizar tu entrada?</h5>
+        <p>Actualiza tu entrada</p>
+
+        <form action="/actualizar" method="post" >
+            <!-- CONTENIDO -->
+            <div class="form-floating mb-3">
+                <textarea class="form-control" placeholder="Contenido" id="floatingTextarea" name="contenidoActualizado" style="height: 100px" ></textarea>
+                <label for="floatingTextarea">Nuevo contenido</label>
+            </div>
+
+            <!-- INPUTS OCULTOS -->
+            <input type="text" readonly value="<%=entrada.id%>" name="idEntrada" style="display: none;" >
+            <input type="text" readonly value="<%=entrada.titulo%>" name="fechaEntrada" style="display: none;" >
+            <input type="text" readonly value="<%=entrada.fecha%>" name="tituloEntrada" style="display: none;" >
+
+
+            <!-- botón submit -->
+            <button type="submit" class="btn btn-primary" style="width: 100% !important;" >Actualizar entrada</button>
+        </form>
+    </div>
+
+
+
+
+    <!-- Formulario ACTUALIZAR -->
+    <div class="container mb-5" >
+        <form action="/borrar" method="post" >
+            <!-- INPUTS OCULTOS -->
+            <input type="text" readonly value="<%=entrada.id%>" name="idEntrada" style="display: none;" >
+    
+            <!-- botón submit -->
+            <button type="submit" class="btn btn-danger" style="width: 100% !important;" >Borrar entrada</button>
+        </form>
+    </div>
 
 
 
