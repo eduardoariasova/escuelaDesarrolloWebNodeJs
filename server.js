@@ -4,54 +4,106 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
-
+const session = require('express-session');
+const passport = require("passport");
+const passportLocalMongoose = require('passport-local-mongoose');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const findOrCreate = require('mongoose-findorcreate');
+// Configuración express
 const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 app.use(express.static("public"));
+// Configuración sesión
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+}));
+// Configuración express
+// inicializamos passport y sesión.
+app.use(passport.initialize());
+app.use(passport.session());
 // solicitudes /////////////////////////////////
+
 
 // CONFIGURACIÓN BASE DE DATOS MONGODB /////////////////////////////////
 // URL de conexión está en archivo .env en la variable "BASEDEATOS". Crea tu cuenta y reemplaza tu contraseña. 
 // El archivo no lo podrás ver en el respositorio porque se oculta con gitignore para proteger contraseñas.
 mongoose.connect(process.env.BASEDEDATOS, {useNewUrlParser: true});
+// CONFIGURACIÓN BASE DE DATOS MONGODB /////////////////////////////////
 
-//1. schema
+
+// ENTRADAS ////////////////////////////////////
+//schema
 const entradasSechema = {
     fecha: String,
     titulo: String,
     contenido: String,
 }
-
-//2. Modelo
+//Modelo
 const EntradaModelo = mongoose.model("Entrada", entradasSechema);
-
-// CLUSTER: (contiene base de datos)
-// - BASE DE DATOS (contiene una o varias colecciones)
-// - - COLECCIONES (contiene documentos)
+// ENTRADAS ////////////////////////////////////
 
 
-//CRUD: CREATE, READ, UPDATE, DELETE
-//A) CREATE /////////
-// const entradaDos = new EntradaModelo( {
-//     fecha: "3/7/2022",
-//     titulo: "Segunda entrada",
-//     contenido: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Urna et pharetra pharetra massa massa. Dui sapien eget mi proin sed libero enim. Est ultricies integer quis auctor elit. Felis imperdiet proin fermentum leo. Morbi tristique senectus et netus et malesuada. Eget mi proin sed libero enim. Vitae auctor eu augue ut lectus arcu. Aliquam etiam erat velit scelerisque in dictum. Imperdiet dui accumsan sit amet.",
-// });
+// USUARIOS //////////////////////////////////
+const Schema = mongoose.Schema;
+const usuarioSechema = new Schema ({
+    username: String,
+    googleId: String,
+});
+// USUARIOS //////////////////////////////////
 
-// const entradaTres = new EntradaModelo({
-//     fecha: "3/8/2022",
-//     titulo: "Tercera entrada",
-//     contenido: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Urna et pharetra pharetra massa massa. Dui sapien eget mi proin sed libero enim. Est ultricies integer quis auctor elit. Felis imperdiet proin fermentum leo. Morbi tristique senectus et netus et malesuada. Eget mi proin sed libero enim. Vitae auctor eu augue ut lectus arcu. Aliquam etiam erat velit scelerisque in dictum. Imperdiet dui accumsan sit amet.",
-// });
-// const documentosAsubir = [entradaDos, entradaTres];
-// EntradaModelo.insertMany(documentosAsubir);
+// HASH Y SALT //////////////////////////////
+usuarioSechema.plugin(passportLocalMongoose);
+// Agregamos find or create al schema
+usuarioSechema.plugin(findOrCreate);
+// HASH Y SALT //////////////////////////////
 
-//B) READ /////////
-// EntradaModelo.find().then( (data) => {
-//     console.log(data);
-// } );
-// CONFIGURACIÓN BASE DE DATOS MONGODB /////////////////////////////////
+// Modelo usuarios
+const Usuario = mongoose.model("Usuario", usuarioSechema);
+// Creamos estrategia a partir del modelo
+passport.use(Usuario.createStrategy());
+
+
+// serializar - deserializar /////////////////
+passport.serializeUser(function(user, cb) {
+    process.nextTick(function() {
+        cb(null, { id: user.id });
+    });
+});
+  
+passport.deserializeUser(function(user, cb) {
+process.nextTick(function() {
+    return cb(null, user);
+});
+});
+// serializar - deserializar /////////////////
+
+
+// CONFIGURACIÓN AUTENTICACION GOOGLE //////////////
+passport.use(new GoogleStrategy({
+    clientID: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    callbackURL: "http://localhost:3000/auth/google/crear"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    console.log(profile);
+    Usuario.findOrCreate({ googleId: profile.id }, {username: profile.displayName}, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
+// CONFIGURACIÓN AUTENTICACION GOOGLE //////////////
+
+
+
+
+
+
+
+
+
 
 
 
@@ -68,6 +120,25 @@ let fechaCompleta = dia + "/" + mes + "/" + año;
 
 
 
+// Iniciar sesión
+app.route("/iniciar-sesion")
+.get(function(req, res){
+    res.render("iniciar");
+});
+
+// Registrar
+app.route("/registrar")
+.get(function(req, res){
+    res.render("registrar");
+});
+
+// auth google
+app.get('/auth/google',passport.authenticate('google', { scope: ['profile'] }));
+// Callback auth google
+app.route("/auth/google/crear")
+.get( passport.authenticate('google', { failureRedirect: "/iniciar-sesion" }),
+    function(req, res) { res.redirect("/crear");
+});
 
 // home
 app.route("/") 
@@ -97,7 +168,13 @@ app.route("/")
 // crear
 app.route("/crear")
 .get(function(req, res){
-    res.render("crear",{fecha: fechaCompleta});
+
+    if(req.isAuthenticated()){
+        res.render("crear",{fecha: fechaCompleta});
+    }
+    else{
+        res.render("iniciar");
+    }
 })
 .post(function(req, res){
     // Guardamos los valores del método post en variables
@@ -116,7 +193,7 @@ app.route("/crear")
     res.redirect("/gracias");
 });
 
-//BUSCAR POST 
+//BUSCAR POST - 
 app.route("/entradas/:cualPost")
 .get(function(req, res){
 
@@ -144,7 +221,7 @@ app.route("/entradas/:cualPost")
 app.route("/actualizar")
 .post(function(req, res){
     //crear variables
-    idEntrada   = req.body.idEntrada;
+    idEntrada      = req.body.idEntrada;
     nuevoContenido = req.body.contenidoActualizado;
     
 
