@@ -1,0 +1,33 @@
+<%- include('partials/header'); -%>
+
+
+    <div style="background-color: rgb(31, 31, 31); padding: 50px 0px 50px 0px; color: white; text-align: center;">
+        <h1>Suscribir</h1>
+        <p>Haz click para suscribirte</p>
+    </div>
+
+
+    <!-- autenticación google -->
+    <div class="container my-5" >
+          <!-- Formulario -->
+        <form action="/suscribir" method="post" >
+            <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="floatingInput" name="email" placeholder="name@example.com">
+                <label for="floatingInput">Email</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="floatingInput" name="nombre" placeholder="daniel">
+              <label for="floatingInput">Nombre</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="floatingInput" name="apellido" placeholder="perez" >
+            <label for="floatingInput">Apellido</label>
+        </div>
+              
+
+            <!-- botón submit -->
+            <button type="submit" class="btn btn-primary mt-3" style="width: 100% !important;" >Suscribirme</button>
+        </form>
+    </div>
+
+<%- include('partials/footer'); -%>

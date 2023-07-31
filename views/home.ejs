@@ -1,13 +1,11 @@
 <%- include('partials/header'); -%>
 
-
-    <div class="container" >
+    <div style="background-color: rgb(31, 31, 31); padding: 50px 0px 50px 0px; color: white; text-align: center;">
         <h1>Mi blog</h1>
         <p class="mb-5" >Aquí encontrarás todas mis entradas</p>
+    </div>
 
-
-        <!-- Titulo -->
-
+    <div class="container" >
         <%for(let i =0; i < todasEntradas.length; i++){  %>
             <%let posActual = todasEntradas[i];  %>
             <!-- POSICION BOCETO -->
@@ -18,6 +16,11 @@
             
             <!-- POSICION BOCETO -->
         <%}%>
+    </div>
+
+    <!-- BOTÓN SUSCRIBIR -->
+    <div class="container mt-5">
+        <a class="btn btn-primary" style="width: 100%;"  href="/suscribir" role="button">Suscribirme</a>
     </div>
     
 

@@ -9,6 +9,7 @@ const passport = require("passport");
 const passportLocalMongoose = require('passport-local-mongoose');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const findOrCreate = require('mongoose-findorcreate');
+const https = require('node:https');
 // Configuración express
 const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
@@ -118,6 +119,78 @@ let año = date.getFullYear();
 let fechaCompleta = dia + "/" + mes + "/" + año;
 // Configuración de fecha /////////
 
+
+//Suscribir
+app.route("/suscribir")
+.get(function(req, res){
+    res.render("suscribir");
+})
+.post(function(req, res){
+    
+    // DATOS A ENVIAR //////////////////////////////////////////
+    // guardar variables
+    let email    = req.body.email;
+    let nombre   = req.body.nombre;
+    let apellido = req.body.apellido;
+
+    // Construir objeto para enviar datos a mailchimp
+    const data = {
+        members: [
+            {
+                email_address: email,
+                status: "subscribed",
+                merge_fields: {
+                    FNAME: nombre,
+                    LNAME: apellido
+                }
+            }
+        ]
+    };
+    // convertir a JSON
+    const jsonData = JSON.stringify(data);
+    // DATOS A ENVIAR //////////////////////////////////////////
+
+        
+
+
+
+    // CONFIGURACIÓN MAILCHIMP /////////////////////////////////////////////
+    // estructrura de la api
+    const url = "https://us20.api.mailchimp.com/3.0/lists/a1c0991348";
+
+    //http request: opciones autenticación
+    const options = {
+        method: "POST",
+        auth: "eduardoariasovalle:ba6036ebe0f0bb2041b6c3e2016c05c0-us20"
+    }
+
+    //http request
+    const request = https.request(url, options, function(response){
+        
+        
+        // EN DADO CASO DE QUE TENGA EXITO
+        if(response.statusCode===200){ res.redirect("/gracias");}
+        else{res.redirect("/"); }
+        
+        
+        
+        //buscar una respuesta
+        response.on("data", function(data){
+            console.log(JSON.parse(data));
+        });
+    });
+    // CONFIGURACIÓN MAILCHIMP /////////////////////////////////////////////
+
+
+
+
+
+    // enviar información a mailchimp
+    request.write(jsonData);
+    // hemos terminado
+    request.end();
+    
+});
 
 
 // Iniciar sesión
